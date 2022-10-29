@@ -1,0 +1,19 @@
+- getCurrentTime:
+#    call: http.get
+#      args:
+#          url: https://us-central1-workflowsample.cloudfunctions.net/datetime
+#    call: https://cloud.google.com/workflows/docs/reference/googleapis/run/v1/namespaces.jobs/run
+    call: googleapis.run.v1.namespaces.jobs.run
+    args:
+        name: savejsonlfile
+    result: CurrentDateTime
+- readWikipedia:
+    call: http.get
+    args:
+        url: https://en.wikipedia.org/w/api.php
+        query:
+            action: opensearch
+            search: $${CurrentDateTime.body.dayOfTheWeek}
+    result: WikiResult
+- returnOutput:
+    return: $${WikiResult.body[1]}
