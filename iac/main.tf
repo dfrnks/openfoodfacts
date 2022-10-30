@@ -1,9 +1,13 @@
-provider "google" {
-  project = "openfoodfacts-datasets"
+variable "project" {
+  default = "openfoodfacts-datasets"
 }
 
-resource "google_project_service" "workflows" {
-  service = "workflows.googleapis.com"
+variable "location" {
+  default = "us-central1"
+}
+
+provider "google" {
+  project = var.project
 }
 
 resource "google_service_account" "workflow" {
@@ -25,10 +29,20 @@ resource "google_storage_bucket_acl" "image-store-acl" {
   ]
 }
 
-resource "google_workflows_workflow" "workflow" {
-  name            = "download-openfoodfacts-products-jsonl"
-  region          = "us-central1"
-  description     = "Download openfoodfacts products jsonl"
-  service_account = google_service_account.workflow.id
-  source_contents = file("${path.module}/../download-openfoodfacts-products-jsonl/workflow.yaml")
+resource "google_project_iam_member" "run-developer" {
+  role    = "roles/run.developer"
+  member  = "serviceAccount:${google_service_account.workflow.email}"
+  project = var.project
+}
+
+resource "google_project_iam_member" "cloudscheduler-serviceAgent" {
+  role    = "roles/cloudscheduler.serviceAgent"
+  member  = "serviceAccount:${google_service_account.workflow.email}"
+  project = var.project
+}
+
+resource "google_project_iam_member" "workflows-serviceAgent" {
+  role    = "roles/workflows.serviceAgent"
+  member  = "serviceAccount:${google_service_account.workflow.email}"
+  project = var.project
 }
