@@ -18,8 +18,9 @@ gcloud beta run jobs create savejsonlfile \
     --project openfoodfacts-datasets \
     --image us-central1-docker.pkg.dev/openfoodfacts-datasets/openfoodfacts-datasets/savejsonlfile:latest \
     --tasks 1 \
-    --cpu=2 \
-    --memory=8Gi \
+    --cpu 2 \
+    --memory 8Gi \
+    --task-timeout 3600 \
     --service-account workflow@openfoodfacts-datasets.iam.gserviceaccount.com \
     --set-env-vars FILE_DOWNLOAD=https://static.openfoodfacts.org/data/openfoodfacts-products.jsonl.gz \
     --set-env-vars BUCKET_NAME=openfoodfacts-datasets \

@@ -1,19 +1,57 @@
-- getCurrentTime:
-#    call: http.get
-#      args:
-#          url: https://us-central1-workflowsample.cloudfunctions.net/datetime
-#    call: https://cloud.google.com/workflows/docs/reference/googleapis/run/v1/namespaces.jobs/run
+# This workflow demonstrates how to use the the Cloud Run connector to create
+# a new service and then deletes it. Note that the location has to be specified.
+# Expected successful output: delete operation's response
+
+- init:
+    assign:
+      - job_name: "test-job"
+      - project: "openfoodfacts-datasets"
+- create_job:
+    call: googleapis.run.v1.namespaces.jobs.create
+    args:
+      location: "us-central1"
+      parent: ${"namespaces/" + project}
+      body:
+        apiVersion: "run.googleapis.com/v1"
+        kind: "Job"
+        metadata:
+          name: ${job_name}
+          namespace: ${project}
+          annotations:
+            run.googleapis.com/launch-stage: BETA
+        spec:
+          template:
+            spec:
+              parallelism: 0
+              taskCount: 1
+              template:
+                spec:
+                  containers:
+                  - image: us-central1-docker.pkg.dev/openfoodfacts-datasets/openfoodfacts-datasets/savejsonlfile:latest
+                    env:
+                    - name: FILE_DOWNLOAD
+                      value: https://static.openfoodfacts.org/data/openfoodfacts-products.jsonl.gz
+                    - name: BUCKET_NAME
+                      value: openfoodfacts-datasets
+                    resources:
+                      limits:
+                        cpu: '2'
+                        memory: 8Gi
+                  maxRetries: 1
+                  timeoutSeconds: '3600'
+                  serviceAccountName: workflow@openfoodfacts-datasets.iam.gserviceaccount.com
+    result: create_job
+- run:
     call: googleapis.run.v1.namespaces.jobs.run
     args:
-        name: savejsonlfile
-    result: CurrentDateTime
-- readWikipedia:
-    call: http.get
+      name: ${"namespaces/" + project + "/jobs/" + job_name}
+      location: "us-central1"
+    result: runResult
+- delete_job:
+    call: googleapis.run.v1.namespaces.jobs.delete
     args:
-        url: https://en.wikipedia.org/w/api.php
-        query:
-            action: opensearch
-            search: $${CurrentDateTime.body.dayOfTheWeek}
-    result: WikiResult
-- returnOutput:
-    return: $${WikiResult.body[1]}
+      location: "us-central1"
+      name: ${"namespaces/" + project + "/jobs/" + job_name}
+    result: delete_job
+- return:
+    return: ${delete_job}
