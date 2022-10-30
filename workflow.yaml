@@ -6,52 +6,66 @@
     assign:
       - job_name: "test-job"
       - project: "openfoodfacts-datasets"
-- create_job:
-    call: googleapis.run.v1.namespaces.jobs.create
-    args:
-      location: "us-central1"
-      parent: ${"namespaces/" + project}
-      body:
-        apiVersion: "run.googleapis.com/v1"
-        kind: "Job"
-        metadata:
-          name: ${job_name}
-          namespace: ${project}
-          annotations:
-            run.googleapis.com/launch-stage: BETA
-        spec:
-          template:
-            spec:
-              parallelism: 0
-              taskCount: 1
-              template:
+- run_savejson_file:
+    try:
+      steps:
+        - create_job:
+            call: googleapis.run.v1.namespaces.jobs.create
+            args:
+              location: "us-central1"
+              parent: ${"namespaces/" + project}
+              body:
+                apiVersion: "run.googleapis.com/v1"
+                kind: "Job"
+                metadata:
+                  name: ${job_name}
+                  namespace: ${project}
+                  annotations:
+                    run.googleapis.com/launch-stage: BETA
                 spec:
-                  containers:
-                  - image: us-central1-docker.pkg.dev/openfoodfacts-datasets/openfoodfacts-datasets/savejsonlfile:latest
-                    env:
-                    - name: FILE_DOWNLOAD
-                      value: https://static.openfoodfacts.org/data/openfoodfacts-products.jsonl.gz
-                    - name: BUCKET_NAME
-                      value: openfoodfacts-datasets
-                    resources:
-                      limits:
-                        cpu: '2'
-                        memory: 8Gi
-                  maxRetries: 1
-                  timeoutSeconds: '3600'
-                  serviceAccountName: workflow@openfoodfacts-datasets.iam.gserviceaccount.com
-    result: create_job
-- run:
-    call: googleapis.run.v1.namespaces.jobs.run
-    args:
-      name: ${"namespaces/" + project + "/jobs/" + job_name}
-      location: "us-central1"
-    result: runResult
-- delete_job:
-    call: googleapis.run.v1.namespaces.jobs.delete
-    args:
-      location: "us-central1"
-      name: ${"namespaces/" + project + "/jobs/" + job_name}
-    result: delete_job
+                  template:
+                    spec:
+                      parallelism: 0
+                      taskCount: 1
+                      template:
+                        spec:
+                          containers:
+                            - image: us-central1-docker.pkg.dev/openfoodfacts-datasets/openfoodfacts-datasets/savejsonlfile:latest
+                              env:
+                                - name: FILE_DOWNLOAD
+                                  value: https://static.openfoodfacts.org/data/openfoodfacts-products.jsonl.gz
+                                - name: BUCKET_NAME
+                                  value: openfoodfacts-datasets
+                              resources:
+                                limits:
+                                  cpu: '1'
+                                  memory: 4Gi
+                          maxRetries: 1
+                          timeoutSeconds: '3600'
+                          serviceAccountName: workflow@openfoodfacts-datasets.iam.gserviceaccount.com
+            result: create_job
+        - run:
+            call: googleapis.run.v1.namespaces.jobs.run
+            args:
+              name: ${"namespaces/" + project + "/jobs/" + job_name}
+              location: "us-central1"
+            result: runResult
+        - delete_job:
+            call: googleapis.run.v1.namespaces.jobs.delete
+            args:
+              location: "us-central1"
+              name: ${"namespaces/" + project + "/jobs/" + job_name}
+            result: delete_job
+    except:
+      as: e
+      steps:
+        - delete_job_error:
+            call: googleapis.run.v1.namespaces.jobs.delete
+            args:
+              location: "us-central1"
+              name: ${"namespaces/" + project + "/jobs/" + job_name}
+            result: delete_job
+        - raiseError:
+            raise: ${e}
 - return:
     return: ${delete_job}
