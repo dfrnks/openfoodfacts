@@ -5,10 +5,10 @@ This is a project to import Open Food Facts database into BigQuery
 
 # Cloud Run
 ```shell
-cd savejsonlfile
+cd download-openfoodfacts-products-jsonl
 gcloud auth configure-docker us-central1-docker.pkg.dev
-docker build -t us-central1-docker.pkg.dev/openfoodfacts-datasets/openfoodfacts-datasets/savejsonlfile .
-docker push us-central1-docker.pkg.dev/openfoodfacts-datasets/openfoodfacts-datasets/savejsonlfile
+docker build -t us-central1-docker.pkg.dev/openfoodfacts-datasets/openfoodfacts-datasets/download-openfoodfacts-products-jsonl .
+docker push us-central1-docker.pkg.dev/openfoodfacts-datasets/openfoodfacts-datasets/download-openfoodfacts-products-jsonl
 ```
 
 ```shell

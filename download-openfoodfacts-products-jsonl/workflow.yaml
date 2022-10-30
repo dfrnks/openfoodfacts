@@ -4,7 +4,7 @@
 
 - init:
     assign:
-      - job_name: "test-job"
+      - job_name: "download-openfoodfacts-products-jsonl"
       - project: "openfoodfacts-datasets"
 - run_savejson_file:
     try:
@@ -30,7 +30,7 @@
                       template:
                         spec:
                           containers:
-                            - image: us-central1-docker.pkg.dev/openfoodfacts-datasets/openfoodfacts-datasets/savejsonlfile:latest
+                            - image: us-central1-docker.pkg.dev/openfoodfacts-datasets/openfoodfacts-datasets/download-openfoodfacts-products-jsonl:latest
                               env:
                                 - name: FILE_DOWNLOAD
                                   value: https://static.openfoodfacts.org/data/openfoodfacts-products.jsonl.gz

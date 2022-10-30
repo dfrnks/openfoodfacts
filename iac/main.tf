@@ -26,9 +26,9 @@ resource "google_storage_bucket_acl" "image-store-acl" {
 }
 
 resource "google_workflows_workflow" "workflow" {
-  name            = "workflow"
+  name            = "download-openfoodfacts-products-jsonl"
   region          = "us-central1"
-  description     = "Magic"
+  description     = "Download openfoodfacts products jsonl"
   service_account = google_service_account.workflow.id
-  source_contents = file("${path.module}/../workflow.yaml")
+  source_contents = file("${path.module}/../download-openfoodfacts-products-jsonl/workflow.yaml")
 }
