@@ -67,7 +67,7 @@ def main():
 
                 write = json.dumps(normalize_dict(json.loads(chunk.decode('utf-8'))))
 
-                f.write(write)
+                f.write(write.encode())
 
 
 if __name__ == "__main__":
