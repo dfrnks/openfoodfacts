@@ -15,7 +15,7 @@ FIELD_MATCHER = re.compile(r'(^[^a-zA-Z])|(\W)')
 BUCKET_NAME = os.getenv("BUCKET_NAME", "openfoodfacts-datasets")
 FILE_DOWNLOAD = os.getenv("FILE_DOWNLOAD", "https://static.openfoodfacts.org/data/openfoodfacts-products.jsonl.gz")
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.WARNING)
 
 
 def iter_lines(r, chunk_size):
