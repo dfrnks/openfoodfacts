@@ -65,7 +65,7 @@ def main():
             for chunk in iter_lines(r, chunk_size=8192):
                 logging.debug(f"Chunk size: {len(chunk)} - {datetime.now().strftime('%Y-%m-%dT%H:%M:%S')}")
 
-                write = json.dumps(normalize_dict(json.loads(chunk.decode('utf-8'))))
+                write = json.dumps(normalize_dict(json.loads(chunk.decode('utf-8')))) + '\n'
 
                 f.write(write.encode())
 
