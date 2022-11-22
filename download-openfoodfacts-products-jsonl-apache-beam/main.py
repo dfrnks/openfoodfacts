@@ -91,7 +91,7 @@ def run(argv=None, save_main_session=True):
     parser.add_argument(
         '--output',
         dest='output',
-        default='gs://openfoodfacts-datasets/beam/openfoodfacts-products',
+        default='gs://openfoodfacts-datasets/beam/openfoodfacts-products-test2',
         # default='../beam/openfoodfacts-products',
         help='Bucket that the file will be saved'
     )
@@ -106,9 +106,19 @@ def run(argv=None, save_main_session=True):
             p
             | "Start" >> beam.Create([known_args.input])
             | "Download File" >> beam.ParDo(downloadFile())
-            | 'Normalize' >> beam.ParDo(normalizeJson())
-            | 'Create Data Object' >> beam.Map(lambda x: {"date": datetime.today().astimezone().isoformat(), "raw": x})
-            | 'Save Files' >> beam.io.WriteToText(known_args.output, file_name_suffix=".jsonl")
+            # | 'Normalize' >> beam.ParDo(normalizeJson())
+            | 'Create Data Object' >> beam.Map(lambda x: {
+                "date": datetime.today().astimezone().isoformat(timespec='minutes'),
+                "raw": json.dumps(x)
+            })
+            # | 'Save Files' >> beam.io.WriteToText(known_args.output, file_name_suffix=".jsonl")
+            | 'Save tp BigQuery' >> beam.io.WriteToBigQuery(
+                project='openfoodfacts-datasets',
+                dataset='test',
+                table='import_directly',
+                schema='date:TIMESTAMP,raw:STRING',
+                # write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE
+            )
         )
 
 
