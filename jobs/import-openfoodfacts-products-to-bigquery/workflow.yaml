@@ -1,21 +1,27 @@
 - init:
     assign:
       - project_id: ${sys.get_env("GOOGLE_CLOUD_PROJECT_ID")}
-      - location: "us-central1"
-      - zone: "us-central1-f"
+      - location: "us-west1"
+      - zone: "us-central1-c"
       - bucket_name: ${ project_id }
       - job_name: "import-openfoodfacts-products-to-bigquery"
       - input: "https://static.openfoodfacts.org/data/openfoodfacts-products.jsonl.gz"
-      - table: "openfoodfacts-json"
+      - table: "openfoodfacts_json"
       - dataset: "raw"
       - temp_location: ${"gs://" + bucket_name + "/dataflow/temp"}
-      - template_path: ${"gs://" + bucket_name + "/dataflow/import-openfoodfacts-products-to-bigquery"}
+      - template_path: ${"gs://" + bucket_name + "/dataflow/import-openfoodfacts-products-to-bigquery.json"}
 - create_job:
-    call: googleapis.dataflow.v1b3.projects.jobs.create
+    call: googleapis.dataflow.v1b3.projects.locations.templates.create
     args:
       projectId: ${project_id}
+      location: ${location}
       body:
         jobName: ${job_name}
+        parameters:
+          project: ${project_id}
+          input: ${input}
+          dataset: ${dataset}
+          table: ${table}
         environment:
           tempLocation: ${temp_location}
         gcsPath: ${template_path}

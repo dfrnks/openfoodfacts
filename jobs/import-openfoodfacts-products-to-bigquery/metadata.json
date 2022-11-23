@@ -1,0 +1,26 @@
+{
+  "name": "Streaming beam Python flex template",
+  "description": "Streaming beam example for python flex template.",
+  "parameters": [
+    {
+      "name": "input",
+      "label": "Input file to download",
+      "helpText": "Url jsonl file to downloading"
+    },
+    {
+      "name": "project",
+      "label": "Project ID",
+      "helpText": "Project ID"
+    },
+    {
+      "name": "dataset",
+      "label": "Dataset name",
+      "helpText": "Dataset name"
+    },
+    {
+      "name": "table",
+      "label": "Table name",
+      "helpText": "Table name"
+    }
+  ]
+}

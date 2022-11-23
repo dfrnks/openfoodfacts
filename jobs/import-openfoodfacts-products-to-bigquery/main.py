@@ -96,16 +96,16 @@ def run(argv=None, save_main_session=True):
         help='jorge'
     )
     parser.add_argument(
-        '--table',
-        dest='table',
-        default='openfoodfacts',
-        help='Table'
-    )
-    parser.add_argument(
         '--dataset',
         dest='dataset',
         default='raw',
         help='Dataset'
+    )
+    parser.add_argument(
+        '--table',
+        dest='table',
+        default='openfoodfacts',
+        help='Table'
     )
 
     known_args, pipeline_args = parser.parse_known_args(argv)
