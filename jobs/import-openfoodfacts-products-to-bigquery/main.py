@@ -86,17 +86,33 @@ def run(argv=None, save_main_session=True):
     parser.add_argument(
         '--input',
         dest='input',
-        default='https://static.openfoodfacts.org/data/openfoodfacts-products.jsonl.gz'
+        default='https://static.openfoodfacts.org/data/openfoodfacts-products.jsonl.gz',
+        help='File to download'
     )
     parser.add_argument(
-        '--output',
-        dest='output',
-        default='gs://openfoodfacts-datasets/beam/openfoodfacts-products-test2',
-        # default='../beam/openfoodfacts-products',
-        help='Bucket that the file will be saved'
+        '--project',
+        dest='project',
+        default='openfoodfacts-datasets',
+        help='jorge'
+    )
+    parser.add_argument(
+        '--table',
+        dest='table',
+        default='openfoodfacts',
+        help='Table'
+    )
+    parser.add_argument(
+        '--dataset',
+        dest='dataset',
+        default='raw',
+        help='Dataset'
     )
 
     known_args, pipeline_args = parser.parse_known_args(argv)
+
+    pipeline_args.extend([
+        '--project=' + known_args.project
+    ])
 
     pipeline_options = PipelineOptions(pipeline_args)
     pipeline_options.view_as(SetupOptions).save_main_session = save_main_session
@@ -106,18 +122,15 @@ def run(argv=None, save_main_session=True):
             p
             | "Start" >> beam.Create([known_args.input])
             | "Download File" >> beam.ParDo(downloadFile())
-            # | 'Normalize' >> beam.ParDo(normalizeJson())
             | 'Create Data Object' >> beam.Map(lambda x: {
                 "date": datetime.today().astimezone().isoformat(timespec='minutes'),
                 "raw": json.dumps(x)
             })
-            # | 'Save Files' >> beam.io.WriteToText(known_args.output, file_name_suffix=".jsonl")
             | 'Save tp BigQuery' >> beam.io.WriteToBigQuery(
-                project='openfoodfacts-datasets',
-                dataset='test',
-                table='import_directly',
+                project=known_args.project,
+                dataset=known_args.dataset,
+                table=known_args.table,
                 schema='date:TIMESTAMP,raw:STRING',
-                # write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE
             )
         )
 
