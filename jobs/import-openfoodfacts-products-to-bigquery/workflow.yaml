@@ -4,7 +4,7 @@
       - location: "us-west1"
       - zone: "us-central1-c"
       - bucket_name: ${ project_id }
-      - job_name: ${"import-openfoodfacts-products-to-bigquery-" + text.substring(time.format(sys.now()), 0, 10)}
+      - job_name: ${"import-openfoodfacts-products-to-bigquery-" + text.substring(time.format(sys.now()), 0, 10) + "-" + text.substring(time.format(sys.now()), 11, 13) + text.substring(time.format(sys.now()), 14, 16) + text.substring(time.format(sys.now()), 17, 19)}
       - input: "https://static.openfoodfacts.org/data/openfoodfacts-products.jsonl.gz"
       - table: "openfoodfacts_json"
       - dataset: "raw"
