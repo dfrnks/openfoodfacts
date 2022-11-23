@@ -4,26 +4,27 @@
       - location: "us-west1"
       - zone: "us-central1-c"
       - bucket_name: ${ project_id }
-      - job_name: "import-openfoodfacts-products-to-bigquery"
+      - job_name: ${"import-openfoodfacts-products-to-bigquery-" + text.substring(time.format(sys.now()), 0, 10)}
       - input: "https://static.openfoodfacts.org/data/openfoodfacts-products.jsonl.gz"
       - table: "openfoodfacts_json"
       - dataset: "raw"
       - temp_location: ${"gs://" + bucket_name + "/dataflow/temp"}
       - template_path: ${"gs://" + bucket_name + "/dataflow/import-openfoodfacts-products-to-bigquery.json"}
 - create_job:
-    call: googleapis.dataflow.v1b3.projects.locations.templates.create
+    call: googleapis.dataflow.v1b3.projects.locations.flexTemplates.launch
     args:
       projectId: ${project_id}
       location: ${location}
       body:
-        jobName: ${job_name}
-        parameters:
-          project: ${project_id}
-          input: ${input}
-          dataset: ${dataset}
-          table: ${table}
-        environment:
-          tempLocation: ${temp_location}
-        gcsPath: ${template_path}
+        launchParameter:
+          containerSpecGcsPath: ${template_path}
+          environment:
+            tempLocation: ${temp_location}
+          jobName: ${job_name}
+          parameters:
+            project: ${project_id}
+            input: ${input}
+            dataset: ${dataset}
+            table: ${table}
 - the_end:
     return: "SUCCESS"
