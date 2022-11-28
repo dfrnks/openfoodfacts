@@ -23,6 +23,12 @@ resource "google_service_account" "deploy_service_account" {
   display_name = "Deploy GH Service Account"
 }
 
+resource "google_project_iam_member" "viewer" {
+  role    = "roles/viewer"
+  member  = "serviceAccount:${google_service_account.deploy_service_account.email}"
+  project = var.project_id
+}
+
 resource "google_project_iam_member" "cloudbuild_builds" {
   role    = "roles/cloudbuild.builds.builder"
   member  = "serviceAccount:${google_service_account.deploy_service_account.email}"
