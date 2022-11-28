@@ -1,0 +1,31 @@
+name: Dataflow jobs
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  import-openfoodfacts-products-to-bigquery:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: action/checkout@v3
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+      - uses: 'google-github-actions/auth@v1'
+        with:
+          workload_identity_provider: '${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}'
+          service_account: '${{ secrets.SERVICE_ACCOUNT }}'
+      - name: Build
+        run: |
+          gcloud builds submit \
+          --project ${{ secrets.PROJECT_ID }} \
+          --tag $ARTIFACTORY_REPO }}/import-openfoodfacts-products-to-bigquery:latest \
+          jobs/import-openfoodfacts-products-to-bigquery/Dockerfile
+      - name: Deploy
+        run: |
+          gcloud dataflow flex-template build gs://${{ CLOUD_STORAGE }}/dataflow/import-openfoodfacts-products-to-bigquery.json \
+          --image "${{ ARTIFACTORY_REPO }}/import-openfoodfacts-products-to-bigquery:latest" \
+          --sdk-language "PYTHON" \
+          --metadata-file "jobs/import-openfoodfacts-products-to-bigquery/metadata.json"
+
