@@ -29,4 +29,3 @@ jobs:
           --image "${{ secrets.ARTIFACTORY_REPO }}/import-openfoodfacts-products-to-bigquery:latest" \
           --sdk-language "PYTHON" \
           --metadata-file "jobs/import-openfoodfacts-products-to-bigquery/metadata.json"
-
