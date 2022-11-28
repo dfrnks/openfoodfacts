@@ -23,8 +23,8 @@ resource "google_service_account" "deploy_service_account" {
   display_name = "Deploy GH Service Account"
 }
 
-resource "google_project_iam_member" "viewer" {
-  role    = "roles/viewer"
+resource "google_project_iam_member" "editor" {
+  role    = "roles/editor"
   member  = "serviceAccount:${google_service_account.deploy_service_account.email}"
   project = var.project_id
 }
