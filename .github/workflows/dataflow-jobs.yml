@@ -26,7 +26,7 @@ jobs:
           gcloud builds submit \
           --project $GCP_PROJECT \
           --region=us-central1 \
-          --gcs-log-dir=gs://$GCP_PROJECT_cloudbuild_logs
+          --gcs-log-dir=gs://$GCP_PROJECT_cloudbuild_logs \
           --tag us-central1-docker.pkg.dev/$GCP_PROJECT/openfoodfacts-datasets/import-openfoodfacts-products-to-bigquery:latest \
           --tag us-central1-docker.pkg.dev/$GCP_PROJECT/openfoodfacts-datasets/import-openfoodfacts-products-to-bigquery:$(git rev-parse --short "$GITHUB_SHA") \
           ./jobs/import-openfoodfacts-products-to-bigquery/
