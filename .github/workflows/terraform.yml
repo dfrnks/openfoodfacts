@@ -30,20 +30,20 @@ jobs:
       - name: Terraform Init
         id: init
         run: |
-        cd ./terraform/iac
-        terraform init
+          cd ./terraform/iac
+          terraform init
 
       - name: Terraform Validate
         id: validate
         run: |
-        cd ./terraform/iac
-        terraform validate
+          cd ./terraform/iac
+          terraform validate
 
       - name: Terraform Plan
         id: plan
         run: |
-        cd ./terraform/iac
-        terraform plan
+          cd ./terraform/iac
+          terraform plan
 
       - run: echo ${{ steps.plan.outputs.stdout }}
       - run: echo ${{ steps.plan.outputs.stderr }}
