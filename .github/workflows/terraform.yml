@@ -27,20 +27,23 @@ jobs:
         uses: hashicorp/setup-terraform@v2.0.3
         with:
           terraform_version: 1.3.5
-      - run: cd ./terraform/iac
       - name: Terraform Init
         id: init
-        run: terraform init
+        run: |
+        cd ./terraform/iac
+        terraform init
 
       - name: Terraform Validate
         id: validate
-        run: terraform validate
-
-      - run: pwd
+        run: |
+        cd ./terraform/iac
+        terraform validate
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan
+        run: |
+        cd ./terraform/iac
+        terraform plan
 
       - run: echo ${{ steps.plan.outputs.stdout }}
       - run: echo ${{ steps.plan.outputs.stderr }}
