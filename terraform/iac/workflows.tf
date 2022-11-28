@@ -11,7 +11,7 @@ resource "google_workflows_workflow" "import-openfoodfacts-products-to-bigquery"
   region          = "us-central1"
   description     = "ETL To import jsonl to bigquery table"
   service_account = google_service_account.workflow.id
-  source_contents = file("${path.module}/../jobs/import-openfoodfacts-products-to-bigquery/workflow.yaml")
+  source_contents = file("${path.module}/../../jobs/import-openfoodfacts-products-to-bigquery/workflow.yaml")
 }
 
 resource "google_cloud_scheduler_job" "import-openfoodfacts-products-to-bigquery" {
