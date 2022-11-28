@@ -27,7 +27,7 @@ jobs:
           --project $GCP_PROJECT \
           --tag us-central1-docker.pkg.dev/$GCP_PROJECT/openfoodfacts-datasets/import-openfoodfacts-products-to-bigquery:latest \
           --tag us-central1-docker.pkg.dev/$GCP_PROJECT/openfoodfacts-datasets/import-openfoodfacts-products-to-bigquery:$(git rev-parse --short "$GITHUB_SHA") \
-          jobs/import-openfoodfacts-products-to-bigquery/Dockerfile
+          ./jobs/import-openfoodfacts-products-to-bigquery/
       - name: Deploy
         run: |
           gcloud dataflow flex-template build gs://$GCP_PROJECT/dataflow/import-openfoodfacts-products-to-bigquery.json \
