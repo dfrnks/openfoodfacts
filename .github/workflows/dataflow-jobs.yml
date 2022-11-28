@@ -7,6 +7,10 @@ on:
 
 jobs:
   import-openfoodfacts-products-to-bigquery:
+    name: 'Deploy dataflow to GCP'
+    permissions:
+      id-token: write
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - uses: 'actions/checkout@v3'
