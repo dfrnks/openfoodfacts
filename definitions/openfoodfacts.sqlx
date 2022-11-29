@@ -1,0 +1,27 @@
+config {
+  type: "table"
+}
+
+SELECT
+    JSON_QUERY(raw, "$._id") id,
+    JSON_QUERY(raw, "$.id") id,
+    JSON_QUERY(raw, "$.created_t") created_t,
+    JSON_QUERY(raw, "$.creator") creator,
+    JSON_QUERY(raw, "$.last_modified_by") last_modified_by,
+    JSON_QUERY(raw, "$.last_modified_t") last_modified_t,
+    JSON_QUERY(raw, "$.product_name") product_name,
+    JSON_QUERY(raw, "$.quantity") quantity,
+    JSON_QUERY(raw, "$.nutrition_data_per") nutrition_data_per,
+    JSON_QUERY(raw, "$.countries") countries,
+    JSON_QUERY(raw, "$.lang") lang,
+    JSON_EXTRACT_ARRAY(JSON_QUERY(raw, "$.categories_properties_tags")) categories_properties_tags,
+    JSON_QUERY(raw, "$.data_sources") data_sources,
+    JSON_QUERY(raw, "$.categories") categories,
+    JSON_QUERY(raw, "$.ingredients_text") ingredients_text,
+    JSON_QUERY(raw, "$.nutriments") nutriments,
+    JSON_QUERY(raw, "$.code") code,
+    JSON_QUERY(raw, "$.ecoscore_grade") ecoscore_grade,
+    JSON_QUERY(raw, "$.images") images
+FROM `openfoodfacts-datasets.raw.openfoodfacts_json`
+WHERE date = "2022-11-23 23:34:00 UTC"
+LIMIT 10
