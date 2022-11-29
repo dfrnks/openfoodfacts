@@ -1,0 +1,26 @@
+config {
+  type: "table"
+}
+
+SELECT
+    JSON_EXTRACT_SCALAR(raw, "$.id") id,
+    TIMESTAMP_SECONDS(CAST(JSON_QUERY(raw, "$.created_t") AS INT64)) created_t,
+    JSON_EXTRACT_SCALAR(raw, "$.creator") creator,
+    JSON_EXTRACT_SCALAR(raw, "$.last_modified_by") last_modified_by,
+    TIMESTAMP_SECONDS(CAST(JSON_QUERY(raw, "$.last_modified_t") AS INT64)) last_modified_t,
+    JSON_EXTRACT_SCALAR(raw, "$.product_name") product_name,
+    JSON_EXTRACT_SCALAR(raw, "$.quantity") quantity,
+    JSON_EXTRACT_SCALAR(raw, "$.nutrition_data_per") nutrition_data_per,
+    JSON_EXTRACT_SCALAR(raw, "$.countries") countries,
+    JSON_EXTRACT_SCALAR(raw, "$.brands") brands,
+    JSON_EXTRACT_SCALAR(raw, "$.lang") lang,
+    JSON_EXTRACT_STRING_ARRAY(raw, "$.categories_properties_tags") categories_properties_tags,
+    SPLIT(JSON_EXTRACT_SCALAR(raw, "$.data_sources"), ",") data_sources,
+    SPLIT(JSON_EXTRACT_SCALAR(raw, "$.categories"), ",") categories,
+    JSON_EXTRACT_SCALAR(raw, "$.ingredients_text") ingredients_text,
+    JSON_EXTRACT_SCALAR(raw, "$.nutriments") nutriments,
+    JSON_EXTRACT_SCALAR(raw, "$.code") code,
+    JSON_EXTRACT_SCALAR(raw, "$.ecoscore_grade") ecoscore_grade,
+    JSON_EXTRACT_SCALAR(raw, "$.images") images
+  FROM
+    `openfoodfacts-datasets.raw.openfoodfacts_json`

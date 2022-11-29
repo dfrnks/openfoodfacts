@@ -1,0 +1,6 @@
+{
+  "name": "openfoodfacts",
+  "dependencies": {
+    "@dataform/core": "2.0.1"
+  }
+}

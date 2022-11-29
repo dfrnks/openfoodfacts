@@ -1,0 +1,7 @@
+{
+  "defaultSchema": "trusted",
+  "assertionSchema": "dataform_assertions",
+  "warehouse": "bigquery",
+  "defaultDatabase": "openfoodfacts-datasets",
+  "defaultLocation": "US"
+}
