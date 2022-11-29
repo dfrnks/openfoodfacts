@@ -1,5 +1,11 @@
 provider "google" {
   project = var.project
+  region      = var.location
+}
+
+provider "google-beta" {
+  project     = var.project
+  region      = var.location
 }
 
 resource "google_service_account" "workflow" {
