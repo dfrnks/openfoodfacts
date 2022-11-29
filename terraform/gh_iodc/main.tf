@@ -29,6 +29,12 @@ resource "google_project_iam_member" "editor" {
   project = var.project_id
 }
 
+resource "google_project_iam_member" "secretmanager_secret_accessor" {
+  role    = "roles/secretmanager.secretAccessor"
+  member  = "serviceAccount:${google_service_account.deploy_service_account.email}"
+  project = var.project_id
+}
+
 resource "google_project_iam_member" "cloudbuild_builds" {
   role    = "roles/cloudbuild.builds.builder"
   member  = "serviceAccount:${google_service_account.deploy_service_account.email}"
