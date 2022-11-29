@@ -18,7 +18,6 @@ docker build -t us-central1-docker.pkg.dev/openfoodfacts-datasets/openfoodfacts-
 docker push us-central1-docker.pkg.dev/openfoodfacts-datasets/openfoodfacts-datasets/download-openfoodfacts-products-jsonl
 ```
 
-
 ```shell
 gcloud builds submit \
 --project openfoodfacts-datasets \

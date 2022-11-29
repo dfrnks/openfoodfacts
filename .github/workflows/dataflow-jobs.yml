@@ -2,10 +2,10 @@ name: Dataflow jobs
 
 on:
   push:
-#    branches:
-#      - main
+    branches:
+      - main
     paths:
-      - jobs
+      - jobs/**
 
 jobs:
   import-openfoodfacts-products-to-bigquery:
