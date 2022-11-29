@@ -8,6 +8,12 @@ resource "google_project_iam_member" "secretmanager_secretAccessor" {
   project = var.project
 }
 
+resource "google_project_iam_member" "bigquery_dataEditor" {
+  role    = "roles/bigquery.dataEditor"
+  member  = "serviceAccount:service-${var.project_number}@gcp-sa-dataform.iam.gserviceaccount.com"
+  project = var.project
+}
+
 resource "google_secret_manager_secret" "dataform_github_personal_token" {
   depends_on = [google_project_service.secretmanager]
 
