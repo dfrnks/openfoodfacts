@@ -5,7 +5,7 @@
 
 -- Config blocks allow you to configure, document, and test your data assets.
 config {
-  type: "view", // Creates a view in BigQuery. Try changing to "table" instead.
+  type: "table", // Creates a view in BigQuery. Try changing to "table" instead.
   columns: {
     test: "A description for the test column", // Column descriptions are pushed to BigQuery.
   }
