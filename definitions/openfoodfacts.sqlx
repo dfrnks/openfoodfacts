@@ -18,7 +18,7 @@ SELECT
     SPLIT(JSON_EXTRACT_SCALAR(raw, "$.data_sources"), ",") data_sources,
     SPLIT(JSON_EXTRACT_SCALAR(raw, "$.categories"), ",") categories,
     JSON_EXTRACT_SCALAR(raw, "$.ingredients_text") ingredients_text,
-    JSON_EXTRACT_SCALAR(raw, "$.nutriments"),
+    JSON_EXTRACT_SCALAR(raw, "$.nutriments") nutriments,
     JSON_EXTRACT_SCALAR(raw, "$.code") code,
     JSON_EXTRACT_SCALAR(raw, "$.ecoscore_grade") ecoscore_grade,
     JSON_EXTRACT_SCALAR(raw, "$.images") images
