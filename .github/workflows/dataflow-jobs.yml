@@ -28,12 +28,11 @@ jobs:
           gcloud builds submit \
           --project $GCP_PROJECT \
           --region=us-central1 \
-          --tag us-central1-docker.pkg.dev/$GCP_PROJECT/openfoodfacts-datasets/import-openfoodfacts-products-to-bigquery:latest \
           --tag us-central1-docker.pkg.dev/$GCP_PROJECT/openfoodfacts-datasets/import-openfoodfacts-products-to-bigquery:$(git rev-parse --short "$GITHUB_SHA") \
           ./jobs/import-openfoodfacts-products-to-bigquery/
       - name: Deploy
         run: |
           gcloud dataflow flex-template build gs://$GCP_PROJECT/dataflow/import-openfoodfacts-products-to-bigquery.json \
-          --image "us-central1-docker.pkg.dev/$GCP_PROJECT/openfoodfacts-datasets/import-openfoodfacts-products-to-bigquery:latest" \
+          --image "us-central1-docker.pkg.dev/$GCP_PROJECT/openfoodfacts-datasets/import-openfoodfacts-products-to-bigquery:$(git rev-parse --short "$GITHUB_SHA")" \
           --sdk-language "PYTHON" \
           --metadata-file "jobs/import-openfoodfacts-products-to-bigquery/metadata.json"
