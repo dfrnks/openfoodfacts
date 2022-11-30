@@ -1,0 +1,136 @@
+main:
+  steps:
+    - init:
+        assign:
+          - project: ${sys.get_env("GOOGLE_CLOUD_PROJECT_ID")}
+          - region: "us-central1"
+    - firstPipeline:
+        call: importOpenfoodfacts
+        args:
+          project: ${project}
+          region: ${region}
+        result: firstJobId
+    - waitFirstDone:
+        call: dataflowWaitUntilStatus
+        args:
+          project: ${project}
+          region: ${region}
+          jobId: ${firstJobId}
+          status: "JOB_STATE_DONE"
+    - secondPipeline:
+        call: executeDataform
+        result: executeDataform
+executeDataform:
+  steps:
+    - init:
+        assign:
+          - repository: projects/openfoodfacts-datasets/locations/us-central1/repositories/openfoodfacts
+    - createCompilationResult:
+        call: http.post
+        args:
+          url: ${"https://dataform.googleapis.com/v1beta1/" + repository + "/compilationResults"}
+          auth:
+            type: OAuth2
+          body:
+            gitCommitish: main
+        result: compilationResult
+    - createWorkflowInvocation:
+        call: http.post
+        args:
+          url: ${"https://dataform.googleapis.com/v1beta1/" + repository + "/workflowInvocations"}
+          auth:
+            type: OAuth2
+          body:
+            compilationResult: ${compilationResult.body.name}
+        result: workflowInvocation
+    - complete:
+        return: ${workflowInvocation.body.name}
+dataflowWaitUntilStatus:
+  params: [ project, region, jobId, status ]
+  steps:
+    - init:
+        assign:
+          - currentStatus: ""
+          - failureStatuses: [ "JOB_STATE_FAILED", "JOB_STATE_CANCELLED", "JOB_STATE_UPDATED", "JOB_STATE_DRAINED" ]
+    - check_condition:
+        switch:
+          - condition: ${currentStatus in failureStatuses}
+            next: exit_fail
+          - condition: ${currentStatus != status}
+            next: iterate
+        next: exit_success
+    - iterate:
+        steps:
+          - sleep60s:
+              call: sys.sleep
+              args:
+                seconds: 60
+          - getExecutionDetails:
+              call: googleapis.dataflow.v1b3.projects.locations.jobs.getExecutionDetails
+              args:
+                jobId: jobId
+                location: region
+                projectId: project
+              result: getExecutionDetailsResult
+          - log:
+              call: sys.log
+              args:
+                text: ${getExecutionDetailsResult}
+                severity: "INFO"
+        #          - getJob:
+        #              call: http.get
+        #              args:
+        #                url: ${"https://dataflow.googleapis.com/v1b3/projects/"+project+"/locations/"+region+"/jobs/"+jobId}
+        #                auth:
+        #                  type: OAuth2
+        #              result: getJobResponse
+        #          - getStatus:
+        #              assign:
+        #                - currentStatus: ${getJobResponse.body.currentState}
+        #          - log:
+        #              call: sys.log
+        #              args:
+        #                text: ${"Current job status="+currentStatus}
+        #                severity: "INFO"
+        next: check_condition
+    - exit_success:
+        return: ${currentStatus}
+    - exit_fail:
+        raise: ${"Job in unexpected terminal status "+currentStatus}
+importOpenfoodfacts:
+  params: [ project, region ]
+  steps:
+    - init:
+        assign:
+          - bucket_name: ${ project }
+          #          - job_name: ${"import-openfoodfacts-products-to-bigquery-" + text.substring(time.format(sys.now()), 0, 10) + "-" + text.substring(time.format(sys.now()), 11, 13) + text.substring(time.format(sys.now()), 14, 16) + text.substring(time.format(sys.now()), 17, 19)}
+          - job_name: "import-openfoodfacts-products-to-bigquery"
+          - input: "https://static.openfoodfacts.org/data/openfoodfacts-products.jsonl.gz"
+          - table: "openfoodfacts_json"
+          - dataset: "raw"
+          - temp_location: ${"gs://" + bucket_name + "/dataflow/temp"}
+          - template_path: ${"gs://" + bucket_name + "/dataflow/import-openfoodfacts-products-to-bigquery.json"}
+    - create_job:
+        call: googleapis.dataflow.v1b3.projects.locations.flexTemplates.launch
+        args:
+          projectId: ${project}
+          location: ${region}
+          body:
+            launchParameter:
+              containerSpecGcsPath: ${template_path}
+              environment:
+                tempLocation: ${temp_location}
+              jobName: ${job_name}
+              parameters:
+                project: ${project}
+                input: ${input}
+                dataset: ${dataset}
+                table: ${table}
+        result: dataflowResponse
+    - log:
+        call: sys.log
+        args:
+          text: ${dataflowResponse}
+          severity: "INFO"
+    - job_created:
+        return: ${dataflowResponse.job.id}

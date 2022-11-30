@@ -1,0 +1,37 @@
+importOpenfoodfacts:
+  params: [ project, region ]
+  steps:
+    - init:
+        assign:
+          - bucket_name: ${ project }
+          #          - job_name: ${"import-openfoodfacts-products-to-bigquery-" + text.substring(time.format(sys.now()), 0, 10) + "-" + text.substring(time.format(sys.now()), 11, 13) + text.substring(time.format(sys.now()), 14, 16) + text.substring(time.format(sys.now()), 17, 19)}
+          - job_name: "import-openfoodfacts-products-to-bigquery"
+          - input: "https://static.openfoodfacts.org/data/openfoodfacts-products.jsonl.gz"
+          - table: "openfoodfacts_json"
+          - dataset: "raw"
+          - temp_location: ${"gs://" + bucket_name + "/dataflow/temp"}
+          - template_path: ${"gs://" + bucket_name + "/dataflow/import-openfoodfacts-products-to-bigquery.json"}
+    - create_job:
+        call: googleapis.dataflow.v1b3.projects.locations.flexTemplates.launch
+        args:
+          projectId: ${project}
+          location: ${region}
+          body:
+            launchParameter:
+              containerSpecGcsPath: ${template_path}
+              environment:
+                tempLocation: ${temp_location}
+              jobName: ${job_name}
+              parameters:
+                project: ${project}
+                input: ${input}
+                dataset: ${dataset}
+                table: ${table}
+        result: dataflowResponse
+    - log:
+        call: sys.log
+        args:
+          text: ${dataflowResponse}
+          severity: "INFO"
+    - job_created:
+        return: ${dataflowResponse.job.id}

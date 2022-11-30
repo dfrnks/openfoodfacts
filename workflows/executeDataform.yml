@@ -1,0 +1,25 @@
+executeDataform:
+  steps:
+    - init:
+        assign:
+          - repository: projects/openfoodfacts-datasets/locations/us-central1/repositories/openfoodfacts
+    - createCompilationResult:
+        call: http.post
+        args:
+          url: ${"https://dataform.googleapis.com/v1beta1/" + repository + "/compilationResults"}
+          auth:
+            type: OAuth2
+          body:
+            gitCommitish: main
+        result: compilationResult
+    - createWorkflowInvocation:
+        call: http.post
+        args:
+          url: ${"https://dataform.googleapis.com/v1beta1/" + repository + "/workflowInvocations"}
+          auth:
+            type: OAuth2
+          body:
+            compilationResult: ${compilationResult.body.name}
+        result: workflowInvocation
+    - complete:
+        return: ${workflowInvocation.body.name}

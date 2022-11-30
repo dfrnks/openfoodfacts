@@ -1,0 +1,52 @@
+DataflowWaitUntilStatus:
+  params: [ project, region, jobId, status ]
+  steps:
+    - init:
+        assign:
+          - currentStatus: ""
+          - failureStatuses: [ "JOB_STATE_FAILED", "JOB_STATE_CANCELLED", "JOB_STATE_UPDATED", "JOB_STATE_DRAINED" ]
+    - check_condition:
+        switch:
+          - condition: ${currentStatus in failureStatuses}
+            next: exit_fail
+          - condition: ${currentStatus != status}
+            next: iterate
+        next: exit_success
+    - iterate:
+        steps:
+          - sleep60s:
+              call: sys.sleep
+              args:
+                seconds: 60
+          - getExecutionDetails:
+              call: googleapis.dataflow.v1b3.projects.locations.jobs.getExecutionDetails
+              args:
+                jobId: jobId
+                location: region
+                projectId: project
+              result: getExecutionDetailsResult
+          - log:
+              call: sys.log
+              args:
+                text: ${getExecutionDetailsResult}
+                severity: "INFO"
+        #          - getJob:
+        #              call: http.get
+        #              args:
+        #                url: ${"https://dataflow.googleapis.com/v1b3/projects/"+project+"/locations/"+region+"/jobs/"+jobId}
+        #                auth:
+        #                  type: OAuth2
+        #              result: getJobResponse
+        #          - getStatus:
+        #              assign:
+        #                - currentStatus: ${getJobResponse.body.currentState}
+        #          - log:
+        #              call: sys.log
+        #              args:
+        #                text: ${"Current job status="+currentStatus}
+        #                severity: "INFO"
+        next: check_condition
+    - exit_success:
+        return: ${currentStatus}
+    - exit_fail:
+        raise: ${"Job in unexpected terminal status "+currentStatus}
