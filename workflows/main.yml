@@ -73,10 +73,10 @@ dataflowWaitUntilStatus:
         next: exit_success
     - iterate:
         steps:
-          - sleep60s:
+          - sleep300s:
               call: sys.sleep
               args:
-                seconds: 60
+                seconds: 300
           - getJob:
               call: googleapis.dataflow.v1b3.projects.locations.jobs.get
               args:
