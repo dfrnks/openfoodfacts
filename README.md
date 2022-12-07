@@ -1,3 +1,6 @@
+
+https://static.openfoodfacts.org/data/data-fields.txt
+
 # openfoodfacts
 This is a project to import Open Food Facts database into BigQuery
 
