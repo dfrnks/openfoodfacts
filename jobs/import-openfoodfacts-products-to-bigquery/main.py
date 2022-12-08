@@ -130,9 +130,8 @@ def run(argv=None, save_main_session=True):
                 project=known_args.project,
                 dataset=known_args.dataset,
                 table=known_args.table,
-                schema='date:TIMESTAMP,raw:JSON',
-                write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
-                method="STREAMING_INSERTS"
+                schema='date:TIMESTAMP,raw:STRING',
+                write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE
             )
         )
 
